@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:maxWidth="310dp"
+    android:maxHeight="400dp"
+    android:padding="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="7dp"
+        android:background="@drawable/incoming_chat_bubble"
+        android:maxWidth="310dp"
+        android:maxHeight="400dp"
+        android:padding="2dp"
+        tools:ignore="MissingDefaultResource">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/reciver_groupchat_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/groupchat_usename"
+                android:layout_width="wrap_content"
+                android:textColor="@color/purple_200"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="4dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mayuresh"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/groupchat_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="4dp"
+                android:text="sjkdhasjdhsjkdhsjkdhsdjkf sdfsidjfsdkf sdfdkfjsdkfsd fsdlfksdlf" />
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
+        <TextView
+            android:id="@+id/reciver_groupchat_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:0APM"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
