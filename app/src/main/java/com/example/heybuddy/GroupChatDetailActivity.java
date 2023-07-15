@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,6 +37,7 @@ public class GroupChatDetailActivity extends AppCompatActivity {
     private ActivityGroupChatDetailBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
+    ChatAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,7 @@ public class GroupChatDetailActivity extends AppCompatActivity {
 
         ArrayList<Messages> messages = new ArrayList<>();
 
-        ChatAdapter adapter = new ChatAdapter(messages, this);
+        adapter = new ChatAdapter(messages, this);
         binding.groupchatRecyclerView.setAdapter(adapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -73,13 +75,32 @@ public class GroupChatDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String message = binding.messageAreaGroupchat.getText().toString();
-                Messages messageModel = new Messages(auth.getUid(), message);
-                messageModel.setTimestamp(new Date().getTime());
-                messageModel.setGroupId(groupId);
-                binding.messageAreaGroupchat.setText("");
-                getUserName(messageModel, groupId);
+                if(!message.equals("")){
+                    Messages messageModel = new Messages(auth.getUid(), message);
+                    messageModel.setTimestamp(new Date().getTime());
+                    messageModel.setGroupId(groupId);
+                    binding.messageAreaGroupchat.setText("");
+                    getUserName(messageModel, groupId);
+                }
+            }
+        });
 
-
+        binding.messageAreaGroupchat.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    String message = binding.messageAreaGroupchat.getText().toString();
+                    if(!message.equals("")){
+                        Messages messageModel = new Messages(auth.getUid(), message);
+                        messageModel.setTimestamp(new Date().getTime());
+                        messageModel.setGroupId(groupId);
+                        binding.messageAreaGroupchat.setText("");
+                        getUserName(messageModel, groupId);
+                    }
+                    return true;
+                }
+                return false;
             }
         });
 
@@ -94,6 +115,14 @@ public class GroupChatDetailActivity extends AppCompatActivity {
                             messages.add(message);
                         }
                         adapter.notifyDataSetChanged();
+                        binding.groupchatRecyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(adapter.getItemCount()!=0){
+                                    binding.groupchatRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                                }
+                            }
+                        });
                     }
 
                     @Override
@@ -125,30 +154,19 @@ public class GroupChatDetailActivity extends AppCompatActivity {
                                     database.getReference().child("groupchats").child(groupId).child("lastmessageuserid").
                                             setValue(model.getUserId());
 
+                                    binding.groupchatRecyclerView.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Call smooth scroll
+                                            if(adapter.getItemCount()!=0){
+                                                binding.groupchatRecyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                                            }
+                                        }
+                                    });
                                 }
                             });
                 }
             }
         });
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.groupchat_menu,menu);
-//        return super.onCreateOptionsMenu(menu);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        switch (item.getItemId()){
-//            case R.id.profile:
-//                break;
-//
-//            case R.id.add_members:
-//                break;
-//
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 }

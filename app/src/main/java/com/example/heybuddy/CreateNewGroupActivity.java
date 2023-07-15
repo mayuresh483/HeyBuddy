@@ -22,12 +22,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class CreateNewGroupActivity extends AppCompatActivity {
 
     ActivityCreateNewGroupBinding binding;
     FirebaseAuth auth;
     FirebaseDatabase database;
+    CreateGroupAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +42,10 @@ public class CreateNewGroupActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
 
         ArrayList<Users> model = new ArrayList<>();
-        CreateGroupAdapter adapter = new CreateGroupAdapter(model,CreateNewGroupActivity.this);
+        adapter = new CreateGroupAdapter(model,CreateNewGroupActivity.this);
         binding.recyclerView.setAdapter(adapter);
 
         ArrayList<Users> selectedData = adapter.getSelectedUserData();
-        int selectedPositionCount = adapter.getSelectedMembers();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
 
@@ -66,6 +67,10 @@ public class CreateNewGroupActivity extends AppCompatActivity {
                     model.add(users);
                 }
                 adapter.notifyDataSetChanged();
+//                int selectedPositionCount = adapter.getSelectedMembers();
+//                int totalMember = adapter.getTotalMembers();
+//                String participantText = selectedPositionCount + " of " + (totalMember-1);
+//                binding.participantSelectedCount.setText(participantText);
             }
 
             @Override
@@ -80,7 +85,7 @@ public class CreateNewGroupActivity extends AppCompatActivity {
                 if(binding.groupnameField.getText().toString().isEmpty()){
                         Toast.makeText(CreateNewGroupActivity.this, "Enter Group Name", Toast.LENGTH_SHORT).show();
                     } else if (selectedData.size() == 0){
-                        Toast.makeText(CreateNewGroupActivity.this, "Need Atleast 1 member to create a group chat", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateNewGroupActivity.this, "Need Atleast 1 member required to create a group chat", Toast.LENGTH_SHORT).show();
                     } else{
                         FirebaseDatabase database = FirebaseDatabase.getInstance();
                         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -93,8 +98,16 @@ public class CreateNewGroupActivity extends AppCompatActivity {
                                 .child("members").setValue(selectedData);
                         database.getReference().child("groupchats").
                             child(auth.getUid()+binding.groupnameField.getText().toString().replace(" ",""))
+                            .child("timestamp").setValue(new Date().getTime());
+                        database.getReference().child("groupchats").
+                            child(auth.getUid()+binding.groupnameField.getText().toString().replace(" ",""))
                             .child("groupId").setValue(auth.getUid()+binding.groupnameField.getText().toString().replace(" ",""));
                     Toast.makeText(CreateNewGroupActivity.this, "New Group "+binding.groupnameField.getText().toString()+" Successfully created", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(CreateNewGroupActivity.this, GroupChatDetailActivity.class);
+                    intent.putExtra("groupid",auth.getUid()+binding.groupnameField.getText().toString().replace(" ",""));
+                    intent.putExtra("groupname",binding.groupnameField.getText().toString());
+                    startActivity(intent);
                 }
             }
         });

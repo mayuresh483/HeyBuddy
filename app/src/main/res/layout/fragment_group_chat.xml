@@ -16,8 +16,9 @@
         android:layout_marginBottom="40dp"
         android:contentDescription="Create Group"
         android:src="@drawable/baseline_group_24"
+        app:tint="@android:color/white"
         android:layout_gravity="center"
-        app:backgroundTint="@color/purple_500"
+        app:backgroundTint="#3F51B5"
         app:maxImageSize="45dp"
         app:fabCustomSize="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
+        tools:layout_editor_absoluteY="16dp"
+       />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatFragment extends Fragment {
 
@@ -52,11 +55,17 @@ public class ChatFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
+                List<Users> templist = new ArrayList<>();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Users users = dataSnapshot.getValue(Users.class);
                     users.getUserId(dataSnapshot.getKey());
-                    list.add(users);
+                    templist.add(users);
                 }
+                List<Users> sortedList = templist.stream()
+                        .sorted((o1, o2) -> (int)(o2.getTimestamp() - o1.getTimestamp()))
+                        .collect(Collectors.toList());
+
+                list.addAll(sortedList);
                 adapter.notifyDataSetChanged();
             }
 

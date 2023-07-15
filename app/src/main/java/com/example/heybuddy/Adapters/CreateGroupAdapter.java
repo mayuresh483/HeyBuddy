@@ -36,10 +36,12 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
     boolean isSelectedMode = false;
     int participantSelectedCount = 0;
     ArrayList<Users> selectedData = new ArrayList<>();
+    CreateNewGroupActivity createNewGroupActivity;
 
     public CreateGroupAdapter(ArrayList<Users> list, Context context){
         this.context = context;
         this.list = list;
+        createNewGroupActivity = new CreateNewGroupActivity();
     }
 
     @NonNull
@@ -53,7 +55,13 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
 
         Users users = list.get(position);
-        Picasso.get().load(users.getProfilepic()).placeholder(R.drawable.facebook).into(holder.imageView);
+        if(users.getProfilepic()!=null){
+            holder.imageView2.setVisibility(View.VISIBLE);
+            Picasso.get().load(users.getProfilepic()).placeholder(R.drawable.user).into(holder.imageView2);
+        }else{
+            holder.imageView.setVisibility(View.VISIBLE);
+            Picasso.get().load((String) null).placeholder(R.drawable.user).into(holder.imageView);
+        }
         holder.userName.setText(users.getUserName().toString());
         holder.lastMessage.setText(users.getUserStatus());
 
@@ -65,10 +73,12 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
                     if(selectedData.contains(list.get(holder.getAdapterPosition()))){
                         holder.countHolder.setVisibility(View.GONE);
                         participantSelectedCount--;
+                        setSelectedMembers(participantSelectedCount);
                         selectedData.remove(list.get(holder.getAdapterPosition()));
                     } else{
                         holder.countHolder.setVisibility(View.VISIBLE);
                         participantSelectedCount++;
+                        setSelectedMembers(participantSelectedCount);
                         selectedData.add(list.get(holder.getAdapterPosition()));
                     }
 
@@ -99,7 +109,7 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
 
     public class viewHolder extends RecyclerView.ViewHolder{
 
-        ImageView imageView;
+        ImageView imageView,imageView2;
         TextView userName, lastMessage, time, participantCount, addGroup;
         TextInputEditText groupName;
         LinearLayout countHolder;
@@ -110,16 +120,26 @@ public class CreateGroupAdapter extends RecyclerView.Adapter<CreateGroupAdapter.
             participantCount = itemView.findViewById(R.id.participant_selected_count);
             groupName = itemView.findViewById(R.id.groupname_field);
             imageView = itemView.findViewById(R.id.profile_image);
+            imageView2 = itemView.findViewById(R.id.profile_image2);
             userName = itemView.findViewById(R.id.username);
             lastMessage = itemView.findViewById(R.id.lastmessage);
             time = itemView.findViewById(R.id.time);
             time.setVisibility(View.GONE);
+            lastMessage.setVisibility(View.GONE);
             countHolder = itemView.findViewById(R.id.selectedcount);
         }
     }
 
     public int getSelectedMembers(){
         return participantSelectedCount;
+    }
+
+    public int getTotalMembers(){
+        return list.size();
+    }
+
+    public void setSelectedMembers(int selectedMemberCount){
+        participantSelectedCount = selectedMemberCount;
     }
 
     public ArrayList<Users> getSelectedUserData(){

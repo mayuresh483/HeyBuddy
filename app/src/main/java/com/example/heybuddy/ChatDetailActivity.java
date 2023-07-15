@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -32,7 +33,8 @@ public class ChatDetailActivity extends AppCompatActivity {
     ActivityChatDetailBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
-    
+    ChatAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +52,14 @@ public class ChatDetailActivity extends AppCompatActivity {
         String sender_Room = senderId + reciverId;
         String reciver_Room = reciverId + senderId;
 
-        Picasso.get().load(profilepic).placeholder(R.drawable.facebook).into(binding.profileImage);
+        if(profilepic!=null){
+            binding.profileImage2.setVisibility(View.VISIBLE);
+            Picasso.get().load(profilepic).placeholder(R.drawable.user).into(binding.profileImage2);
+        }else{
+            binding.profileImage.setVisibility(View.VISIBLE);
+            Picasso.get().load((String) null).placeholder(R.drawable.user).into(binding.profileImage);
+        }
+
         binding.usernameChatdetail.setText(userName);
 
         binding.backButton.setOnClickListener(new View.OnClickListener() {
@@ -63,35 +72,96 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         ArrayList<Messages> messages = new ArrayList<>();
 
-        ChatAdapter adapter = new ChatAdapter(messages,this);
+        adapter = new ChatAdapter(messages,this);
         binding.recyclerView.setAdapter(adapter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         binding.recyclerView.setLayoutManager(layoutManager);
 
+        binding.messageArea.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    String message = binding.messageArea.getText().toString();
+                    if(!message.equals("")){
+                        Messages messageModel = new Messages(senderId,message);
+                        messageModel.setTimestamp(new Date().getTime());
+                        binding.messageArea.setText("");
+
+                        database.getReference().child("chats").child(sender_Room)
+                                .push().setValue(messageModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        database.getReference().child("chats").child(reciver_Room)
+                                                .push().setValue(messageModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        database.getReference().child("Users").child(reciverId).child("lastmessage").
+                                                                setValue(messageModel.getMessage());
+                                                        database.getReference().child("Users").child(reciverId).child("timestamp").
+                                                                setValue(messageModel.getTimestamp());
+                                                        database.getReference().child("Users").child(reciverId).child("lastmessageuserid").
+                                                                setValue(senderId);
+
+                                                        binding.recyclerView.post(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                // Call smooth scroll
+                                                                if(adapter.getItemCount()!=0){
+                                                                    binding.recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
         binding.sentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String message = binding.messageArea.getText().toString();
-                Messages messageModel = new Messages(senderId,message);
-                messageModel.setTimestamp(new Date().getTime());
-                binding.messageArea.setText("");
+                if(!message.equals("")){
+                    Messages messageModel = new Messages(senderId,message);
+                    messageModel.setTimestamp(new Date().getTime());
+                    binding.messageArea.setText("");
 
+                    database.getReference().child("chats").child(sender_Room)
+                            .push().setValue(messageModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    database.getReference().child("chats").child(reciver_Room)
+                                            .push().setValue(messageModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    database.getReference().child("Users").child(reciverId).child("lastmessage").
+                                                            setValue(messageModel.getMessage());
+                                                    database.getReference().child("Users").child(reciverId).child("timestamp").
+                                                            setValue(messageModel.getTimestamp());
+                                                    database.getReference().child("Users").child(reciverId).child("lastmessageuserid").
+                                                            setValue(senderId);
 
-                database.getReference().child("chats").child(sender_Room)
-                        .push().setValue(messageModel).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                database.getReference().child("chats").child(reciver_Room)
-                                        .push().setValue(messageModel).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-
-                                            }
-                                        });
-                            }
-                        });
-
+                                                    binding.recyclerView.post(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            // Call smooth scroll
+                                                            if(adapter.getItemCount()!=0){
+                                                                binding.recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                }
+                            });
+                }
             }
         });
 
@@ -105,6 +175,15 @@ public class ChatDetailActivity extends AppCompatActivity {
                     messages.add(message);
                 }
                 adapter.notifyDataSetChanged();
+                binding.recyclerView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Call smooth scroll
+                        if(adapter.getItemCount()!=0){
+                            binding.recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                        }
+                    }
+                });
             }
 
             @Override
@@ -112,6 +191,5 @@ public class ChatDetailActivity extends AppCompatActivity {
 
             }
         });
-
     }
 }

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import com.example.heybuddy.Adapters.GroupChatAdapter;
 import com.example.heybuddy.CreateNewGroupActivity;
 import com.example.heybuddy.Models.GroupChats;
+import com.example.heybuddy.Models.Users;
 import com.example.heybuddy.databinding.FragmentGroupChatBinding;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GroupChatFragment extends Fragment {
 
@@ -31,6 +35,7 @@ public class GroupChatFragment extends Fragment {
 
     private FragmentGroupChatBinding binding;
     private FirebaseDatabase firebaseDatabase;
+    private static final String TAG = "GroupChatFragment";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,11 +55,18 @@ public class GroupChatFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
+                ArrayList<GroupChats> templist = new ArrayList<>();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     GroupChats users = dataSnapshot.getValue(GroupChats.class);
                     users.getUserId(dataSnapshot.getKey());
-                    list.add(users);
+                    templist.add(users);
                 }
+                List<GroupChats> sortedList = templist.stream()
+                        .sorted((o1, o2) -> (int)(o2.getTimestamp() - o1.getTimestamp()))
+                        .collect(Collectors.toList());
+
+                Log.d(TAG, "onDataChange: "+sortedList);
+                list.addAll(sortedList);
                 adapter.notifyDataSetChanged();
             }
 

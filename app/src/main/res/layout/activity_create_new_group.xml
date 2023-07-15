@@ -35,10 +35,11 @@
                 android:id="@+id/username_chatdetail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
+                android:layout_marginLeft="8dp"
                 android:paddingLeft="10dp"
                 android:text="Create new Group"
-                android:textSize="24sp"
+                android:textSize="22sp"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/back_button"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -49,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:text="ADD"
                 android:textStyle="bold"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.864"
@@ -73,7 +75,7 @@
             android:id="@+id/username_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="3dp"
             app:boxBackgroundColor="@color/white"
             app:errorEnabled="true">
 
@@ -90,6 +92,10 @@
         <TextView
             android:id="@+id/participant_selected_count"
             android:layout_width="match_parent"
+            android:text="1 of 2020"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginLeft="15dp"
             android:layout_height="wrap_content" />
     </LinearLayout>
 

@@ -4,13 +4,16 @@ public class Users {
     private String profilepic;
     private String userPhoneNumber;
     private String userName;
-
     private String userId;
     private String userEmail;
     private String password;
     private String userStatus;
 
+    public long getTimestamp() {
+        return timestamp;
+    }
 
+    private long timestamp;
 
     public Users(String profilepic, String userPhoneNumber, String userName, String userId, String userEmail, String password, String userStatus) {
         this.profilepic = profilepic;
@@ -74,6 +77,27 @@ public class Users {
     public String getUserId() {
         return userId;
     }
+
+    public String getLastmessage() {
+        return lastmessage;
+    }
+
+    public void setLastmessage(String lastmessage) {
+        this.lastmessage = lastmessage;
+    }
+
+    private String lastmessage;
+
+
+    public String getLastmessageuserid() {
+        return lastmessageuserid;
+    }
+
+    public void setLastmessageuserid(String lastmessageuserid) {
+        this.lastmessageuserid = lastmessageuserid;
+    }
+
+    private String lastmessageuserid;
 
     public void setUserId(String userId) {
         this.userId = userId;

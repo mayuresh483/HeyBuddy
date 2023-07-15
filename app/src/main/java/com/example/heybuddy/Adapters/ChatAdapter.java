@@ -22,7 +22,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 public class ChatAdapter extends RecyclerView.Adapter {
@@ -60,11 +62,21 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
         if (holder.getClass() == SenderViewHolder.class) {
             ((SenderViewHolder) holder).senderMessage.setText(message.getMessage());
+            Date date = new Date(message.getTimestamp());
+            SimpleDateFormat formatTime = new SimpleDateFormat("hh.mm aa");
+            String time = formatTime.format(
+                    date);
+            ((SenderViewHolder) holder).senderTime.setText(time);
         } else if (holder.getClass() == ReceiverGroupChatViewHolder.class) {
             ((ReceiverGroupChatViewHolder) holder).reciverMessage.setText(message.getMessage());
             ((ReceiverGroupChatViewHolder) holder).userName.setText(message.getUsername());
         } else {
             ((ReceiverViewHolder) holder).reciverMessage.setText(message.getMessage());
+            Date date = new Date(message.getTimestamp());
+            SimpleDateFormat formatTime = new SimpleDateFormat("hh.mm aa");
+            String time = formatTime.format(
+                    date);
+            ((ReceiverViewHolder) holder).reciverTime.setText(time);
         }
     }
 
